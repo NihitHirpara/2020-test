@@ -1,0 +1,345 @@
+{% render 'tt-boot' %}
+<script src="{{ 'tt-product.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'tt-product-form-' | append: section.id
+  assign related_collection = section.settings.related_collection
+  if related_collection == blank
+    assign related_collection = collections['all-farm-goods']
+  endif
+  assign currency_code = cart.currency.iso_code | default: shop.currency
+-%}
+
+<section
+  class="tt-product"
+  id="tt-product"
+  data-currency="{{ currency_code }}"
+  {{ section.shopify_attributes }}
+>
+  <header class="tt-product__topbar">
+    <a class="tt-product__brand" href="{{ routes.root_url }}">{{ section.settings.brand_name | default: 'TenTwenty Farms' }}</a>
+    <nav class="tt-product__nav" aria-label="Shop">
+      <a href="/collections/all-farm-goods">Shop all</a>
+      <a href="{{ routes.collections_url }}">Collections</a>
+      <a href="{{ routes.cart_url }}">Cart{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</a>
+    </nav>
+  </header>
+
+  <div class="tt-product__crumbs">
+    <a href="/collections/all-farm-goods">All Farm Goods</a>
+    <span aria-hidden="true">/</span>
+    <span>{{ product.title }}</span>
+  </div>
+
+  <div class="tt-product__layout">
+    <div class="tt-product__gallery" data-tt-gallery>
+      <div class="tt-product__stage">
+        {%- if product.media.size > 0 -%}
+          {%- for media in product.media -%}
+            <figure
+              class="tt-product__frame{% if forloop.first %} is-active{% endif %}"
+              data-tt-frame
+              data-media-id="{{ media.id }}"
+            >
+              {%- if forloop.first -%}
+                {{
+                  media.preview_image
+                  | image_url: width: 1600
+                  | image_tag:
+                    loading: 'eager',
+                    fetchpriority: 'high',
+                    widths: '600,900,1200,1600',
+                    sizes: '(min-width: 990px) 52vw, 100vw',
+                    alt: media.alt | default: product.title,
+                    class: 'tt-product__img'
+                }}
+              {%- else -%}
+                {{
+                  media.preview_image
+                  | image_url: width: 1600
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '600,900,1200,1600',
+                    sizes: '(min-width: 990px) 52vw, 100vw',
+                    alt: media.alt | default: product.title,
+                    class: 'tt-product__img'
+                }}
+              {%- endif -%}
+            </figure>
+          {%- endfor -%}
+        {%- else -%}
+          <figure class="tt-product__frame is-active">
+            {{ 'product-1' | placeholder_svg_tag: 'tt-product__img tt-product__img--ph' }}
+          </figure>
+        {%- endif -%}
+      </div>
+
+      {%- if product.media.size > 1 -%}
+        <div class="tt-product__thumbs" role="list">
+          {%- for media in product.media -%}
+            <button
+              type="button"
+              class="tt-product__thumb{% if forloop.first %} is-active{% endif %}"
+              data-tt-thumb
+              data-media-id="{{ media.id }}"
+              aria-label="View image {{ forloop.index }}"
+            >
+              {{
+                media.preview_image
+                | image_url: width: 200
+                | image_tag: loading: 'lazy', alt: '', widths: '100,200', sizes: '72px'
+              }}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="tt-product__buy">
+      <p class="tt-product__vendor">{{ product.vendor | default: section.settings.brand_name | default: 'TenTwenty Farms' }}</p>
+      <h1 class="tt-product__title">{{ product.title }}</h1>
+
+      {%- if product.type != blank -%}
+        <p class="tt-product__type">{{ product.type }}</p>
+      {%- endif -%}
+
+      <div class="tt-product__price" data-tt-price>
+        {{ current_variant.price | money }}
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <s class="tt-product__compare">{{ current_variant.compare_at_price | money }}</s>
+        {%- endif -%}
+      </div>
+
+      {%- if product.description != blank -%}
+        <div class="tt-product__desc rte">
+          {{ product.description }}
+        </div>
+      {%- endif -%}
+
+      {% form 'product', product, id: product_form_id, class: 'tt-product__form', data-tt-form: '' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" data-tt-variant-id>
+
+        {%- unless product.has_only_default_variant -%}
+          <div class="tt-product__options">
+            {%- for option in product.options_with_values -%}
+              <fieldset class="tt-product__option" data-tt-option="{{ option.name | escape }}">
+                <legend>
+                  {{ option.name }}
+                  <span data-tt-option-value>{{ option.selected_value }}</span>
+                </legend>
+                <div class="tt-product__swatches">
+                  {%- for value in option.values -%}
+                    {%- assign option_disabled = true -%}
+                    {%- for variant in product.variants -%}
+                      {%- if variant.available -%}
+                        {%- if option.position == 1 and variant.option1 == value -%}
+                          {%- assign option_disabled = false -%}
+                        {%- elsif option.position == 2 and variant.option2 == value -%}
+                          {%- assign option_disabled = false -%}
+                        {%- elsif option.position == 3 and variant.option3 == value -%}
+                          {%- assign option_disabled = false -%}
+                        {%- endif -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                    <label class="tt-product__swatch{% if option.selected_value == value %} is-selected{% endif %}{% if option_disabled %} is-unavailable{% endif %}">
+                      <input
+                        type="radio"
+                        name="options[{{ option.name | escape }}]"
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}checked{% endif %}
+                        data-tt-option-input
+                        data-option-position="{{ option.position }}"
+                      >
+                      <span>{{ value }}</span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endfor -%}
+          </div>
+        {%- endunless -%}
+
+        <div class="tt-product__actions">
+          <div class="tt-product__qty" data-tt-qty>
+            <button type="button" data-tt-qty-minus aria-label="Decrease quantity">−</button>
+            <input
+              type="number"
+              name="quantity"
+              value="1"
+              min="1"
+              inputmode="numeric"
+              data-tt-qty-input
+              aria-label="Quantity"
+            >
+            <button type="button" data-tt-qty-plus aria-label="Increase quantity">+</button>
+          </div>
+
+          <button
+            type="submit"
+            name="add"
+            class="tt-product__atc"
+            data-tt-atc
+            {% unless current_variant.available %}disabled{% endunless %}
+          >
+            <span data-tt-atc-label>
+              {%- if current_variant.available -%}
+                {{ section.settings.atc_label | default: 'Add to cart' }}
+              {%- else -%}
+                Sold out
+              {%- endif -%}
+            </span>
+          </button>
+        </div>
+      {% endform %}
+
+      {%- if section.settings.meta_1 != blank or section.settings.meta_2 != blank or section.settings.meta_3 != blank -%}
+        <div class="tt-product__meta-row">
+          {%- if section.settings.meta_1 != blank -%}<span>{{ section.settings.meta_1 }}</span>{%- endif -%}
+          {%- if section.settings.meta_2 != blank -%}<span>{{ section.settings.meta_2 }}</span>{%- endif -%}
+          {%- if section.settings.meta_3 != blank -%}<span>{{ section.settings.meta_3 }}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <div class="tt-product__accordions">
+        {%- if section.settings.farm_notes != blank -%}
+          <details class="tt-product__acc" open>
+            <summary>{{ section.settings.farm_notes_title | default: 'Farm notes' }}</summary>
+            <div>{{ section.settings.farm_notes }}</div>
+          </details>
+        {%- endif -%}
+        {%- if section.settings.delivery_notes != blank -%}
+          <details class="tt-product__acc">
+            <summary>{{ section.settings.delivery_title | default: 'Delivery' }}</summary>
+            <div>{{ section.settings.delivery_notes }}</div>
+          </details>
+        {%- endif -%}
+        {%- if product.tags.size > 0 -%}
+          <details class="tt-product__acc">
+            <summary>Tags</summary>
+            <div class="tt-product__tags">
+              {%- for tag in product.tags -%}
+                <span>{{ tag }}</span>
+              {%- endfor -%}
+            </div>
+          </details>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  {%- if related_collection != blank and related_collection.products_count > 1 -%}
+    <div class="tt-product__related">
+      <div class="tt-product__related-head">
+        <h2>{{ section.settings.related_heading | default: 'Also from the farm' }}</h2>
+        <a href="{{ related_collection.url }}">View all</a>
+      </div>
+      <div class="tt-product__related-grid">
+        {%- assign shown = 0 -%}
+        {%- for related_product in related_collection.products -%}
+          {%- if related_product.id == product.id -%}{%- continue -%}{%- endif -%}
+          {%- if shown >= 4 -%}{%- break -%}{%- endif -%}
+          <a class="tt-product__card" href="{{ related_product.url }}">
+            <div class="tt-product__card-media">
+              {%- if related_product.featured_media -%}
+                {{
+                  related_product.featured_media
+                  | image_url: width: 800
+                  | image_tag: loading: 'lazy', widths: '400,600,800', sizes: '(min-width: 990px) 22vw, 45vw', alt: related_product.title
+                }}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag }}
+              {%- endif -%}
+            </div>
+            <div class="tt-product__card-copy">
+              <h3>{{ related_product.title }}</h3>
+              <p>{{ related_product.price | money }}</p>
+            </div>
+          </a>
+          {%- assign shown = shown | plus: 1 -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+<script type="application/json" data-tt-product-json>
+  {{ product.variants | json }}
+</script>
+
+{% schema %}
+{
+  "name": "TT Product",
+  "tag": "section",
+  "class": "tt-section-product",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand name",
+      "default": "TenTwenty Farms"
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Add to cart label",
+      "default": "Add to cart"
+    },
+    {
+      "type": "text",
+      "id": "meta_1",
+      "label": "Highlight 1",
+      "default": "Fresh from the farm"
+    },
+    {
+      "type": "text",
+      "id": "meta_2",
+      "label": "Highlight 2",
+      "default": "Same-week harvest"
+    },
+    {
+      "type": "text",
+      "id": "meta_3",
+      "label": "Highlight 3",
+      "default": "Packed to order"
+    },
+    {
+      "type": "text",
+      "id": "farm_notes_title",
+      "label": "Farm notes title",
+      "default": "Farm notes"
+    },
+    {
+      "type": "textarea",
+      "id": "farm_notes",
+      "label": "Farm notes",
+      "default": "Grown and packed by TenTwenty Farms. Expect natural variation in size and color — that’s how you know it’s real."
+    },
+    {
+      "type": "text",
+      "id": "delivery_title",
+      "label": "Delivery title",
+      "default": "Delivery"
+    },
+    {
+      "type": "textarea",
+      "id": "delivery_notes",
+      "label": "Delivery notes",
+      "default": "Orders placed before noon ship the next harvest day. Keep refrigerated on arrival for peak flavor."
+    },
+    {
+      "type": "text",
+      "id": "related_heading",
+      "label": "Related products heading",
+      "default": "Also from the farm"
+    },
+    {
+      "type": "collection",
+      "id": "related_collection",
+      "label": "Related products collection",
+      "info": "Defaults to All Farm Goods when empty"
+    }
+  ],
+  "presets": [{ "name": "TT Product" }]
+}
+{% endschema %}

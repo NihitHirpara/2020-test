@@ -1,0 +1,103 @@
+{
+  "sections": {
+    "tt_hero": {
+      "type": "tt-hero",
+      "blocks": {
+        "slide_1": { "type": "slide", "settings": {} },
+        "slide_2": { "type": "slide", "settings": {} },
+        "slide_3": { "type": "slide", "settings": {} },
+        "slide_4": { "type": "slide", "settings": {} }
+      },
+      "block_order": ["slide_1", "slide_2", "slide_3", "slide_4"],
+      "settings": {
+        "contact_label": "Contact us",
+        "caption": "Welcome To TenTwenty Farms",
+        "title": "From our Farms|to your hands",
+        "autoplay_duration": 5
+      }
+    },
+    "tt_quality": {
+      "type": "tt-quality-gallery",
+      "blocks": {
+        "client_1": {
+          "type": "client",
+          "settings": {
+            "client_name": "Client 6",
+            "location": "Abu Dhabi, United Arab Emirates"
+          }
+        },
+        "client_2": {
+          "type": "client",
+          "settings": {
+            "client_name": "Client 2",
+            "location": "London, United Kingdom"
+          }
+        },
+        "client_3": {
+          "type": "client",
+          "settings": {
+            "client_name": "Client 1",
+            "location": "Dubai, United Arab Emirates"
+          }
+        },
+        "client_4": {
+          "type": "client",
+          "settings": {
+            "client_name": "Client 3",
+            "location": "Singapore"
+          }
+        },
+        "client_5": {
+          "type": "client",
+          "settings": {
+            "client_name": "Client 4",
+            "location": "Hong Kong"
+          }
+        },
+        "client_6": {
+          "type": "client",
+          "settings": {
+            "client_name": "Client 5",
+            "location": "Istanbul, Turkey"
+          }
+        }
+      },
+      "block_order": ["client_1", "client_2", "client_3", "client_4", "client_5", "client_6"],
+      "settings": {
+        "heading": "Quality Products",
+        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "start_index": 2
+      }
+    },
+    "tt_shop": {
+      "type": "tt-shop",
+      "blocks": {
+        "col_1": {
+          "type": "collection",
+          "settings": { "collection": "fresh-produce" }
+        },
+        "col_2": {
+          "type": "collection",
+          "settings": { "collection": "herbs-dairy" }
+        },
+        "col_3": {
+          "type": "collection",
+          "settings": { "collection": "farm-pantry" }
+        },
+        "col_4": {
+          "type": "collection",
+          "settings": { "collection": "all-farm-goods" }
+        }
+      },
+      "block_order": ["col_1", "col_2", "col_3", "col_4"],
+      "settings": {
+        "collections_heading": "Shop by collection",
+        "products_collection": "all-farm-goods",
+        "products_heading": "All Farm Goods",
+        "products_link_label": "View all & filter",
+        "products_limit": 6
+      }
+    }
+  },
+  "order": ["tt_hero", "tt_quality", "tt_shop"]
+}

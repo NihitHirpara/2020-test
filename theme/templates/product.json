@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "tt-product",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

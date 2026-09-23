@@ -1,0 +1,53 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Local only
+horizon-fresh/
+tt-backup/
+INTERVIEW-GUIDE.md
+scripts/
+theme/STRUCTURE.md
+
+# Secrets
+.env
+.env.*
+*.pem
+.shopify/
+node_modules/
+
+# Full Horizon base ? commit custom tt-* only
+theme/assets/*
+!theme/assets/tt-*
+theme/sections/*
+!theme/sections/tt-hero.liquid
+!theme/sections/tt-quality-gallery.liquid
+!theme/sections/tt-shop.liquid
+!theme/sections/tt-product.liquid
+theme/snippets/*
+!theme/snippets/tt-boot.liquid
+!theme/snippets/tt-header.liquid
+!theme/snippets/tt-nav-defaults.liquid
+!theme/snippets/tt-product-card.liquid
+theme/templates/*
+!theme/templates/index.json
+!theme/templates/product.json
+theme/blocks/
+theme/config/
+theme/layout/
+theme/locales/
+theme/LICENSE.md
+theme/README.md
+theme/release-notes.md
+theme/sections/tt-cart.liquid
+theme/sections/tt-collection.liquid
+theme/sections/tt-404.liquid
+theme/sections/tt-page.liquid
+theme/sections/tt-password.liquid
+theme/sections/tt-search.liquid
+theme/sections/tt-list-collections.liquid
+theme/snippets/tt-meta.liquid
+theme/snippets/tt-site-footer.liquid

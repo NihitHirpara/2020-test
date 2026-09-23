@@ -1,0 +1,116 @@
+{% render 'tt-boot' %}
+
+<section class="tt-shop" {{ section.shopify_attributes }}>
+  {%- if section.settings.collections_heading != blank -%}
+    <div class="tt-shop__head">
+      <h2>{{ section.settings.collections_heading }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="tt-shop__collections">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'collection' and block.settings.collection != blank -%}
+        {%- assign col = block.settings.collection -%}
+        <a class="tt-shop__col" href="{{ col.url }}" {{ block.shopify_attributes }}>
+          <div class="tt-shop__col-media">
+            {%- if col.featured_image -%}
+              {{
+                col.featured_image
+                | image_url: width: 900
+                | image_tag: loading: 'lazy', widths: '400,600,900', sizes: '(min-width: 990px) 23vw, 45vw', alt: col.title
+              }}
+            {%- elsif col.products.first.featured_media -%}
+              {{
+                col.products.first.featured_media
+                | image_url: width: 900
+                | image_tag: loading: 'lazy', widths: '400,600,900', sizes: '(min-width: 990px) 23vw, 45vw', alt: col.title
+              }}
+            {%- else -%}
+              {{ 'collection-1' | placeholder_svg_tag }}
+            {%- endif -%}
+          </div>
+          <h3>{{ col.title }}</h3>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- assign product_collection = section.settings.products_collection -%}
+  {%- if product_collection != blank -%}
+    <div class="tt-shop__products-head">
+      <h2>{{ section.settings.products_heading | default: product_collection.title }}</h2>
+      <a href="{{ product_collection.url }}">{{ section.settings.products_link_label | default: 'View all & filter' }}</a>
+    </div>
+    <div class="tt-shop__products">
+      {%- for product in product_collection.products limit: section.settings.products_limit -%}
+        {% render 'tt-product-card', product: product %}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "TT Shop",
+  "tag": "section",
+  "class": "tt-section-shop",
+  "settings": [
+    {
+      "type": "text",
+      "id": "collections_heading",
+      "label": "Collections heading",
+      "default": "Shop by collection"
+    },
+    {
+      "type": "collection",
+      "id": "products_collection",
+      "label": "Products collection"
+    },
+    {
+      "type": "text",
+      "id": "products_heading",
+      "label": "Products heading",
+      "default": "All Farm Goods"
+    },
+    {
+      "type": "text",
+      "id": "products_link_label",
+      "label": "Products link label",
+      "default": "View all & filter"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "label": "Products to show",
+      "default": 6
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TT Shop",
+      "blocks": [
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" }
+      ]
+    }
+  ]
+}
+{% endschema %}

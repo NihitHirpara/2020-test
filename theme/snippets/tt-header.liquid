@@ -1,0 +1,64 @@
+<header class="tt-header">
+  <nav class="tt-header__nav-wrap" aria-label="Primary">
+    <ul class="tt-header__nav">
+      {%- if menu != blank and menu.links.size > 0 -%}
+        {%- for link in menu.links -%}
+          <li>
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {% render 'tt-nav-defaults', tag: 'li' %}
+      {%- endif -%}
+    </ul>
+  </nav>
+
+  <a
+    class="tt-header__cta"
+    href="{% if contact_link != blank %}{{ contact_link }}{% else %}/pages/contact{% endif %}"
+  >
+    <span>{{ contact_label | default: 'Contact us' }}</span>
+    <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
+      <path d="M0 7h16M10 1l6 6-6 6" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+  </a>
+
+  <button type="button" class="tt-header__menu-btn" aria-label="Open menu" data-tt-menu-open>
+    <span></span>
+  </button>
+</header>
+
+<div class="tt-header__drawer" data-tt-drawer hidden>
+  <div class="tt-header__drawer-panel">
+    <button type="button" class="tt-header__drawer-close" aria-label="Close menu" data-tt-menu-close>&times;</button>
+    {%- if menu != blank and menu.links.size > 0 -%}
+      {%- for link in menu.links -%}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor -%}
+    {%- else -%}
+      {% render 'tt-nav-defaults' %}
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var openBtn = document.querySelector('[data-tt-menu-open]');
+    var closeBtn = document.querySelector('[data-tt-menu-close]');
+    var drawer = document.querySelector('[data-tt-drawer]');
+    if (!drawer) return;
+    function open() {
+      drawer.hidden = false;
+      drawer.classList.add('is-open');
+    }
+    function close() {
+      drawer.classList.remove('is-open');
+      drawer.hidden = true;
+    }
+    if (openBtn) openBtn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    drawer.addEventListener('click', function (e) {
+      if (e.target === drawer) close();
+    });
+  })();
+</script>
