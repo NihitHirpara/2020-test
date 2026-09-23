@@ -1,0 +1,157 @@
+{% render 'tt-boot' %}
+<script src="{{ 'tt-collection.js' | asset_url }}" defer></script>
+
+{%- paginate collection.products by section.settings.products_per_page -%}
+
+<section class="tt-plp" id="tt-plp" data-tt-plp {{ section.shopify_attributes }}>
+  <header class="tt-plp__topbar">
+    <a class="tt-plp__brand" href="{{ routes.root_url }}">TenTwenty Farms</a>
+    <nav class="tt-plp__nav" aria-label="Shop">
+      <a href="/collections/all-farm-goods">Shop all</a>
+      <a href="{{ routes.collections_url }}">Collections</a>
+      <a href="{{ routes.cart_url }}">Cart{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</a>
+    </nav>
+  </header>
+
+  <div class="tt-plp__head">
+    <h1>{{ collection.title }}</h1>
+    {%- if collection.description != blank -%}
+      <div class="tt-plp__desc rte">{{ collection.description }}</div>
+    {%- endif -%}
+  </div>
+
+  <div class="tt-plp__layout">
+    <aside class="tt-plp__filters" aria-label="Product filters">
+      <div class="tt-plp__filters-inner" data-tt-filters>
+        <h2 class="tt-plp__filters-title">Filters</h2>
+
+        <details class="tt-plp__filter" open data-tt-filter-group="category">
+          <summary>Category</summary>
+          <div class="tt-plp__filter-values" data-tt-filter-options="category"></div>
+        </details>
+
+        <details class="tt-plp__filter" open data-tt-filter-group="color">
+          <summary>Color</summary>
+          <div class="tt-plp__filter-values" data-tt-filter-options="color"></div>
+        </details>
+
+        {%- if collection.filters.size > 0 -%}
+          <form class="tt-plp__native-filters">
+            <p class="tt-plp__native-label">More filters</p>
+            {%- for filter in collection.filters -%}
+              <details class="tt-plp__filter" {% if forloop.first %}open{% endif %}>
+                <summary>{{ filter.label }}</summary>
+                <div class="tt-plp__filter-values">
+                  {%- case filter.type -%}
+                    {%- when 'list', 'boolean' -%}
+                      {%- for value in filter.values -%}
+                        <label class="tt-plp__filter-option">
+                          <input
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value }}"
+                            {% if value.active %}checked{% endif %}
+                            onchange="this.form.submit()"
+                          >
+                          <span>{{ value.label }} ({{ value.count }})</span>
+                        </label>
+                      {%- endfor -%}
+                  {%- endcase -%}
+                </div>
+              </details>
+            {%- endfor -%}
+          </form>
+        {%- endif -%}
+
+        <button type="button" class="tt-plp__clear" data-tt-clear hidden>Clear filters</button>
+      </div>
+    </aside>
+
+    <div class="tt-plp__main">
+      <div class="tt-plp__toolbar">
+        <p>
+          <span data-tt-count>{{ collection.products.size }}</span> products
+        </p>
+        <form class="tt-plp__sort">
+          <label for="SortBy-{{ section.id }}">Sort</label>
+          <select name="sort_by" id="SortBy-{{ section.id }}" onchange="this.form.submit()">
+            {%- for option in collection.sort_options -%}
+              <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected{% endif %}>
+                {{ option.name }}
+              </option>
+            {%- endfor -%}
+          </select>
+        </form>
+      </div>
+
+      <div class="tt-plp__grid" data-tt-grid>
+        {%- for product in collection.products -%}
+          {%- assign color_values = '' -%}
+          {%- for option in product.options_with_values -%}
+            {%- assign opt_down = option.name | downcase -%}
+            {%- if opt_down == 'color' or opt_down == 'colour' -%}
+              {%- for value in option.values -%}
+                {%- if color_values != blank -%}
+                  {%- assign color_values = color_values | append: '|' -%}
+                {%- endif -%}
+                {%- assign color_values = color_values | append: value -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          <article
+            class="tt-plp__item"
+            data-tt-item
+            data-category="{{ product.type | escape }}"
+            data-colors="{{ color_values | escape }}"
+          >
+            {% render 'tt-product-card', product: product %}
+            {%- if product.type != blank -%}
+              <p class="tt-plp__item-meta">{{ product.type }}</p>
+            {%- endif -%}
+            {%- if color_values != blank -%}
+              <p class="tt-plp__item-meta">{{ color_values | split: '|' | join: ', ' }}</p>
+            {%- endif -%}
+          </article>
+        {%- else -%}
+          <p class="tt-plp__empty">No products in this collection.</p>
+        {%- endfor -%}
+      </div>
+
+      <p class="tt-plp__empty" data-tt-empty hidden>No products match these filters.</p>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="tt-plp__pagination" aria-label="Pagination">
+          {%- if paginate.previous -%}
+            <a href="{{ paginate.previous.url }}">Previous</a>
+          {%- endif -%}
+          <span>Page {{ paginate.current_page }} of {{ paginate.pages }}</span>
+          {%- if paginate.next -%}
+            <a href="{{ paginate.next.url }}">Next</a>
+          {%- endif -%}
+        </nav>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "TT Collection",
+  "tag": "section",
+  "class": "tt-section-plp",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 12,
+      "max": 50,
+      "step": 1,
+      "label": "Products per page",
+      "default": 50
+    }
+  ]
+}
+{% endschema %}

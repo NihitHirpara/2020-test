@@ -27,14 +27,17 @@ theme/sections/*
 !theme/sections/tt-quality-gallery.liquid
 !theme/sections/tt-shop.liquid
 !theme/sections/tt-product.liquid
+!theme/sections/tt-collection.liquid
 theme/snippets/*
 !theme/snippets/tt-boot.liquid
 !theme/snippets/tt-header.liquid
 !theme/snippets/tt-nav-defaults.liquid
 !theme/snippets/tt-product-card.liquid
+!theme/snippets/tt-seo.liquid
 theme/templates/*
 !theme/templates/index.json
 !theme/templates/product.json
+!theme/templates/collection.json
 theme/blocks/
 theme/config/
 theme/layout/
@@ -43,7 +46,6 @@ theme/LICENSE.md
 theme/README.md
 theme/release-notes.md
 theme/sections/tt-cart.liquid
-theme/sections/tt-collection.liquid
 theme/sections/tt-404.liquid
 theme/sections/tt-page.liquid
 theme/sections/tt-password.liquid

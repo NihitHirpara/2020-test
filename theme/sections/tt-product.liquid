@@ -26,11 +26,13 @@
     </nav>
   </header>
 
-  <div class="tt-product__crumbs">
+  <nav class="tt-product__crumbs" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span aria-hidden="true">/</span>
     <a href="/collections/all-farm-goods">All Farm Goods</a>
     <span aria-hidden="true">/</span>
-    <span>{{ product.title }}</span>
-  </div>
+    <span aria-current="page">{{ product.title }}</span>
+  </nav>
 
   <div class="tt-product__layout">
     <div class="tt-product__gallery" data-tt-gallery>

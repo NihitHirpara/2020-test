@@ -1579,12 +1579,49 @@ tt-gallery {
   cursor: pointer;
 }
 
-.tt-plp__clear {
-  display: inline-block;
-  margin-top: 1rem;
+.tt-plp__filters-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tt-plp__filter-empty {
+  margin: 0;
   font-size: 0.85rem;
   color: var(--tt-muted, #7a7777);
 }
+
+.tt-plp__native-label {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tt-muted, #7a7777);
+}
+
+.tt-plp__item-meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--tt-muted, #7a7777);
+}
+
+.tt-plp__clear {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--tt-muted, #7a7777);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tt-plp__item[hidden] {
+  display: none !important;
+}
+
 
 .tt-plp__toolbar {
   display: flex;

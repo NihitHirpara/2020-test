@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "tt-collection",
+      "settings": {
+        "products_per_page": 50
+      }
+    }
+  },
+  "order": ["main"]
+}

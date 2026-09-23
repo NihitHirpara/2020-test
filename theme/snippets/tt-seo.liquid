@@ -1,0 +1,86 @@
+{%- if request.page_type == 'product' and product != blank -%}
+  {%- assign seo_variant = product.selected_or_first_available_variant -%}
+  {%- assign seo_image = product.featured_media.preview_image | default: product.featured_image -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": {{ product.title | json }},
+      "url": {{ request.origin | append: product.url | json }},
+      "description": {{ product.description | strip_html | truncate: 500 | json }},
+      "sku": {{ seo_variant.sku | default: seo_variant.id | json }},
+      "brand": {
+        "@type": "Brand",
+        "name": {{ product.vendor | default: shop.name | json }}
+      },
+      {%- if product.type != blank -%}
+      "category": {{ product.type | json }},
+      {%- endif -%}
+      {%- if seo_image != blank -%}
+      "image": [
+        {{ seo_image | image_url: width: 1200 | prepend: 'https:' | json }}
+      ],
+      {%- endif -%}
+      "offers": {
+        "@type": "Offer",
+        "url": {{ request.origin | append: product.url | json }},
+        "priceCurrency": {{ cart.currency.iso_code | default: shop.currency | json }},
+        "price": {{ seo_variant.price | money_without_currency | replace: ',', '' | json }},
+        "availability": "https://schema.org/{% if seo_variant.available %}InStock{% else %}OutOfStock{% endif %}",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": {{ request.origin | json }}
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "All Farm Goods",
+          "item": {{ request.origin | append: '/collections/all-farm-goods' | json }}
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ product.title | json }},
+          "item": {{ request.origin | append: product.url | json }}
+        }
+      ]
+    }
+  </script>
+{%- elsif request.page_type == 'index' -%}
+  {%- capture seo_search_target -%}{{ request.origin }}/search?q={search_term_string}{%- endcapture -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      "url": {{ request.origin | json }}
+      {%- if settings.favicon != blank -%}
+      ,"logo": {{ settings.favicon | image_url: width: 512 | prepend: 'https:' | json }}
+      {%- endif -%}
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "url": {{ request.origin | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ seo_search_target | json }},
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+{%- endif -%}
